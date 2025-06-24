@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wallcraft_manager/wallcraft_manager.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,6 +13,16 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final WallcraftManager wallcraftManager = WallcraftManager();
+
+  @override
+  void initState() {
+    wallcraftManager.isSupported().then((isSupported) {
+      print('Wallcraft Manager is supported: $isSupported');
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
