@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.wallcraftai.wp.plugin.wallcraft_manager_example"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 35
     ndkVersion = "29.0.13113456"
 
     compileOptions {
@@ -21,8 +21,8 @@ android {
 
     defaultConfig {
         applicationId = "com.wallcraftai.wp.plugin.wallcraft_manager_example"
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        minSdk = 21
+        targetSdk = 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }

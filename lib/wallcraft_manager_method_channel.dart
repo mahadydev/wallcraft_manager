@@ -11,6 +11,12 @@ class MethodChannelWallcraftManager extends WallcraftManagerPlatform {
   final methodChannel = const MethodChannel('wallcraft_manager');
 
   @override
+  Future<bool> isSupported() async {
+    final result = await methodChannel.invokeMethod<bool>('isSupported');
+    return result ?? false;
+  }
+
+  @override
   Future<bool> setWallpaperFromFile({
     required String filePath,
     required WallpaperSetterType type,
@@ -35,8 +41,20 @@ class MethodChannelWallcraftManager extends WallcraftManagerPlatform {
   }
 
   @override
-  Future<bool> isSupported() async {
-    final result = await methodChannel.invokeMethod<bool>('isSupported');
+  Future<bool> saveImageToGalleryFromFile({required String filePath}) async {
+    final result = await methodChannel.invokeMethod<bool>(
+      'saveImageToGalleryFromFile',
+      {'filePath': filePath},
+    );
+    return result ?? false;
+  }
+
+  @override
+  Future<bool> saveImageToGalleryFromBytes({required Uint8List bytes}) async {
+    final result = await methodChannel.invokeMethod<bool>(
+      'saveImageToGalleryFromBytes',
+      {'bytes': bytes},
+    );
     return result ?? false;
   }
 }

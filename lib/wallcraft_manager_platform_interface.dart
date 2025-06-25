@@ -26,6 +26,10 @@ abstract class WallcraftManagerPlatform extends PlatformInterface {
     _instance = instance;
   }
 
+  Future<bool> isSupported() {
+    throw UnimplementedError('isSupported() has not been implemented.');
+  }
+
   Future<bool> setWallpaperFromFile({
     required String filePath,
     required WallpaperSetterType type,
@@ -44,7 +48,15 @@ abstract class WallcraftManagerPlatform extends PlatformInterface {
     );
   }
 
-  Future<bool> isSupported() {
-    throw UnimplementedError('isSupported() has not been implemented.');
+  Future<bool> saveImageToGalleryFromFile({required String filePath}) {
+    throw UnimplementedError(
+      'saveImageToGalleryFromFile() has not been implemented.',
+    );
+  }
+
+  Future<bool> saveImageToGalleryFromBytes({required Uint8List bytes}) {
+    throw UnimplementedError(
+      'saveImageToGalleryFromBytes() has not been implemented.',
+    );
   }
 }
