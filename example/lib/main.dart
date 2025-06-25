@@ -31,7 +31,7 @@ class HomeScreen extends StatelessWidget {
 
   // Example image URL (replace with your own or make dynamic)
   final String imageUrl =
-      'https://images.pexels.com/photos/1122639/pexels-photo-1122639.jpeg';
+      'https://images.pexels.com/photos/29145098/pexels-photo-29145098.jpeg';
 
   @override
   Widget build(BuildContext context) {

@@ -1,4 +1,4 @@
-package com.wallcraftai.wp.plugin.wallcraft_manager
+package wp.plugin.wallcraft.manager
 
 import android.app.WallpaperManager
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -17,7 +17,7 @@ import android.util.Log
 import java.util.concurrent.atomic.AtomicBoolean
 
 /** WallcraftManagerPlugin */
-class WallcraftManagerPlugin: FlutterPlugin, MethodCallHandler {
+class WallcraftManagerPlugin : FlutterPlugin, MethodCallHandler {
     private lateinit var channel: MethodChannel
     private lateinit var context: Context
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -44,9 +44,8 @@ class WallcraftManagerPlugin: FlutterPlugin, MethodCallHandler {
         }
     }
 
-    private fun handleIsSupported(result: Result, resultSent: AtomicBoolean) {
+    private fun handleIsSupported(result: Result, resultSent: AtomicBoolean) =
         sendResultOnce(resultSent) { result.success(true) }
-    }
 
     private fun handleSetWallpaperFromFile(call: MethodCall, result: Result, resultSent: AtomicBoolean) {
         val filePath = call.argument<String>("filePath")
@@ -144,7 +143,7 @@ class WallcraftManagerPlugin: FlutterPlugin, MethodCallHandler {
         scope.launch(handler) {
             val bitmap = withContext(Dispatchers.IO) {
                 try {
-                    android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                    BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
                 } catch (e: Exception) {
                     Log.e("WallcraftManager", "Error decoding bytes: ${e.message}", e)
                     null
@@ -222,7 +221,7 @@ class WallcraftManagerPlugin: FlutterPlugin, MethodCallHandler {
         details: String? = null
     ) {
         if (exception != null) {
-            Log.e("WallcraftManager", logMsg + ": " + exception.message, exception)
+            Log.e("WallcraftManager", "$logMsg: ${exception.message}", exception)
         } else {
             Log.e("WallcraftManager", logMsg)
         }
@@ -259,7 +258,7 @@ class WallcraftManagerPlugin: FlutterPlugin, MethodCallHandler {
                     } else {
                         // Android < 10: Write to Pictures directory and scan
                         val picturesDir = android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_PICTURES)
-                        val wallcraftDir = java.io.File(picturesDir, "Wallcraft")
+                        val wallcraftDir = File(picturesDir, "Wallcraft")
                         if (!wallcraftDir.exists()) {
                             val created = wallcraftDir.mkdirs()
                             if (!created) {
@@ -267,7 +266,7 @@ class WallcraftManagerPlugin: FlutterPlugin, MethodCallHandler {
                                 return@withContext false
                             }
                         }
-                        val file = java.io.File(wallcraftDir, fileName)
+                        val file = File(wallcraftDir, fileName)
                         file.writeBytes(bytes)
                         // Scan file so it appears in gallery
                         val intent = android.content.Intent(android.content.Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)

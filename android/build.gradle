@@ -1,4 +1,4 @@
-group = "com.wallcraftai.wp.plugin.wallcraft_manager"
+group = "wp.plugin.wallcraft.manager"
 version = "1.0-SNAPSHOT"
 
 buildscript {
@@ -25,7 +25,7 @@ apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
 
 android {
-    namespace = "com.wallcraftai.wp.plugin.wallcraft_manager"
+    namespace = "wp.plugin.wallcraft.manager"
 
     compileSdk = 35
 

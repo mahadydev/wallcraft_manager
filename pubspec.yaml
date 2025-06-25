@@ -21,7 +21,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.wallcraftai.wp.plugin.wallcraft_manager
+        package: wp.plugin.wallcraft.manager
         pluginClass: WallcraftManagerPlugin
       ios:
         pluginClass: WallcraftManagerPlugin
