@@ -191,69 +191,74 @@ class _ImageDetailScreenState extends State<ImageDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Image Details')),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Hero(
-            tag: widget.imageUrl,
-            child: CachedNetworkImage(
-              imageUrl: widget.imageUrl,
-              height: 300,
-              fit: BoxFit.cover,
-              placeholder: (context, url) =>
-                  const Center(child: CircularProgressIndicator()),
-              errorWidget: (context, url, error) => const Icon(Icons.error),
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: Hero(
+                tag: widget.imageUrl,
+                child: CachedNetworkImage(
+                  imageUrl: widget.imageUrl,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) =>
+                      const Center(child: CircularProgressIndicator()),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                ),
+              ),
             ),
-          ),
-          const SizedBox(height: 24),
-          if (_downloading) const LinearProgressIndicator(),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: _downloading
-                      ? null
-                      : () => _setWallpaper(WallpaperSetterType.homeScreen),
-                  icon: const Icon(Icons.wallpaper),
-                  label: const Text('Set as Home Screen'),
-                ),
-
-                ElevatedButton.icon(
-                  onPressed: _downloading
-                      ? null
-                      : () => _setWallpaper(WallpaperSetterType.lockScreen),
-                  icon: const Icon(Icons.lock),
-                  label: const Text('Set as Lock Screen'),
-                ),
-
-                ElevatedButton.icon(
-                  onPressed: _downloading
-                      ? null
-                      : () => _setWallpaper(WallpaperSetterType.both),
-                  icon: const Icon(Icons.screen_lock_landscape),
-                  label: const Text('Set as Both'),
-                ),
-
-                OutlinedButton.icon(
-                  onPressed: _downloading ? null : _downloadSaveImageToGallery,
-                  icon: const Icon(Icons.save_as),
-                  label: const Text('Save Image to Gallery'),
-                ),
-
-                Text(
-                  _status,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.blueAccent,
+            const SizedBox(height: 24),
+            if (_downloading) const LinearProgressIndicator(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: _downloading
+                        ? null
+                        : () => _setWallpaper(WallpaperSetterType.homeScreen),
+                    icon: const Icon(Icons.wallpaper),
+                    label: const Text('Set as Home Screen'),
                   ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
+
+                  ElevatedButton.icon(
+                    onPressed: _downloading
+                        ? null
+                        : () => _setWallpaper(WallpaperSetterType.lockScreen),
+                    icon: const Icon(Icons.lock),
+                    label: const Text('Set as Lock Screen'),
+                  ),
+
+                  ElevatedButton.icon(
+                    onPressed: _downloading
+                        ? null
+                        : () => _setWallpaper(WallpaperSetterType.both),
+                    icon: const Icon(Icons.screen_lock_landscape),
+                    label: const Text('Set as Both'),
+                  ),
+
+                  OutlinedButton.icon(
+                    onPressed: _downloading
+                        ? null
+                        : _downloadSaveImageToGallery,
+                    icon: const Icon(Icons.save_as),
+                    label: const Text('Save Image to Gallery'),
+                  ),
+
+                  Text(
+                    _status,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.blueAccent,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
