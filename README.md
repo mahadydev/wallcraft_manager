@@ -47,7 +47,9 @@ Add the following to your `ios/Runner/Info.plist`:
 
 ```xml
 <key>NSPhotoLibraryAddUsageDescription</key>
-<string>This app needs access to save images to your photo library.</string>
+<string>This app needs access to save wallpapers to your photo library</string>
+<key>NSPhotoLibraryUsageDescription</key>
+<string>This app needs access to save wallpapers to your photo library</string>
 ```
 
 ## Usage
