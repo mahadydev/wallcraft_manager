@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'wallcraft_manager'
-  s.version          = '1.0.0'
+  s.version          = '1.0.1'
   s.summary          = 'A Flutter plugin for setting wallpapers and saving images to gallery.'
   s.description      = <<-DESC
 A Flutter plugin that provides functionality to set wallpapers and save images to the device gallery on Android and iOS platforms.

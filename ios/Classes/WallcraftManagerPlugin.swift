@@ -29,7 +29,6 @@ public class WallcraftManagerPlugin: NSObject, FlutterPlugin {
     
     private func handleIsSupported(result: @escaping FlutterResult) {
         // iOS doesn't support programmatic wallpaper setting
-        // Only saving to Photos and manual setting by user
         result(false)
     }
     
@@ -40,39 +39,46 @@ public class WallcraftManagerPlugin: NSObject, FlutterPlugin {
             return
         }
         
-        // iOS doesn't support programmatic wallpaper setting
-        // Redirect to save to Photos instead
-        saveImageToPhotos(filePath: filePath) { success, error in
-            if let error = error {
-                result(FlutterError(code: "SAVE_ERROR", message: error.localizedDescription, details: nil))
-            } else {
-                // Show alert to user about manual setting
-                DispatchQueue.main.async {
-                    self.showWallpaperInstructions()
-                }
-                result(success)
-            }
+        guard let imageData = NSData(contentsOfFile: filePath) else {
+            result(FlutterError(code: "FILE_NOT_FOUND", message: "Could not read file at path: \(filePath)", details: nil))
+            return
         }
+        
+        guard let image = UIImage(data: imageData as Data) else {
+            result(FlutterError(code: "INVALID_IMAGE", message: "Could not decode image from file", details: nil))
+            return
+        }
+        
+        setWallpaperFromImage(image: image, result: result)
     }
     
     private func handleSetWallpaperFromBytes(call: FlutterMethodCall, result: @escaping FlutterResult) {
         guard let args = call.arguments as? [String: Any],
               let bytes = args["bytes"] as? FlutterStandardTypedData else {
-            result(FlutterError(code: "INVALID_ARGUMENT", message: "Bytes are required", details: nil))
+            result(FlutterError(code: "INVALID_ARGUMENT", message: "Bytes data is required", details: nil))
             return
         }
         
-        // iOS doesn't support programmatic wallpaper setting
-        // Redirect to save to Photos instead
-        saveImageToPhotos(imageData: bytes.data) { success, error in
-            if let error = error {
-                result(FlutterError(code: "SAVE_ERROR", message: error.localizedDescription, details: nil))
-            } else {
-                // Show alert to user about manual setting
+        guard let image = UIImage(data: bytes.data) else {
+            result(FlutterError(code: "INVALID_IMAGE", message: "Could not decode image from bytes", details: nil))
+            return
+        }
+        
+        setWallpaperFromImage(image: image, result: result)
+    }
+    
+    private func setWallpaperFromImage(image: UIImage, result: @escaping FlutterResult) {
+        // Since iOS doesn't support programmatic wallpaper setting,
+        // we'll save the image to Photos and show instructions to the user
+        saveImageToPhotos(image: image) { [weak self] success, error in
+            if success {
                 DispatchQueue.main.async {
-                    self.showWallpaperInstructions()
+                    self?.showWallpaperInstructions()
                 }
-                result(success)
+                result(true)
+            } else {
+                let errorMessage = error?.localizedDescription ?? "Failed to save image to Photos"
+                result(FlutterError(code: "SAVE_ERROR", message: errorMessage, details: nil))
             }
         }
     }
@@ -84,11 +90,22 @@ public class WallcraftManagerPlugin: NSObject, FlutterPlugin {
             return
         }
         
-        saveImageToPhotos(filePath: filePath) { success, error in
-            if let error = error {
-                result(FlutterError(code: "SAVE_ERROR", message: error.localizedDescription, details: nil))
+        guard let imageData = NSData(contentsOfFile: filePath) else {
+            result(FlutterError(code: "FILE_NOT_FOUND", message: "Could not read file at path: \(filePath)", details: nil))
+            return
+        }
+        
+        guard let image = UIImage(data: imageData as Data) else {
+            result(FlutterError(code: "INVALID_IMAGE", message: "Could not decode image from file", details: nil))
+            return
+        }
+        
+        saveImageToPhotos(image: image) { success, error in
+            if success {
+                result(true)
             } else {
-                result(success)
+                let errorMessage = error?.localizedDescription ?? "Failed to save image to Photos"
+                result(FlutterError(code: "SAVE_ERROR", message: errorMessage, details: nil))
             }
         }
     }
@@ -96,84 +113,65 @@ public class WallcraftManagerPlugin: NSObject, FlutterPlugin {
     private func handleSaveImageToGalleryFromBytes(call: FlutterMethodCall, result: @escaping FlutterResult) {
         guard let args = call.arguments as? [String: Any],
               let bytes = args["bytes"] as? FlutterStandardTypedData else {
-            result(FlutterError(code: "INVALID_ARGUMENT", message: "Bytes are required", details: nil))
+            result(FlutterError(code: "INVALID_ARGUMENT", message: "Bytes data is required", details: nil))
             return
         }
         
-        saveImageToPhotos(imageData: bytes.data) { success, error in
-            if let error = error {
-                result(FlutterError(code: "SAVE_ERROR", message: error.localizedDescription, details: nil))
+        guard let image = UIImage(data: bytes.data) else {
+            result(FlutterError(code: "INVALID_IMAGE", message: "Could not decode image from bytes", details: nil))
+            return
+        }
+        
+        saveImageToPhotos(image: image) { success, error in
+            if success {
+                result(true)
             } else {
-                result(success)
+                let errorMessage = error?.localizedDescription ?? "Failed to save image to Photos"
+                result(FlutterError(code: "SAVE_ERROR", message: errorMessage, details: nil))
             }
         }
-    }
-    
-    private func saveImageToPhotos(filePath: String, completion: @escaping (Bool, Error?) -> Void) {
-        guard let image = UIImage(contentsOfFile: filePath) else {
-            completion(false, NSError(domain: "WallcraftManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid image file"]))
-            return
-        }
-        
-        saveImageToPhotos(image: image, completion: completion)
-    }
-    
-    private func saveImageToPhotos(imageData: Data, completion: @escaping (Bool, Error?) -> Void) {
-        guard let image = UIImage(data: imageData) else {
-            completion(false, NSError(domain: "WallcraftManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid image data"]))
-            return
-        }
-        
-        saveImageToPhotos(image: image, completion: completion)
     }
     
     private func saveImageToPhotos(image: UIImage, completion: @escaping (Bool, Error?) -> Void) {
-        // Check Photos permission
-        let status = PHPhotoLibrary.authorizationStatus(for: .addOnly)
+        // Check photo library permission
+        let authStatus = PHPhotoLibrary.authorizationStatus()
         
-        switch status {
-        case .authorized, .limited:
+        switch authStatus {
+        case .authorized:
             performSaveToPhotos(image: image, completion: completion)
-        case .denied, .restricted:
-            completion(false, NSError(domain: "WallcraftManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "Photos access denied"]))
         case .notDetermined:
-            PHPhotoLibrary.requestAuthorization(for: .addOnly) { newStatus in
-                if newStatus == .authorized || newStatus == .limited {
-                    self.performSaveToPhotos(image: image, completion: completion)
-                } else {
-                    completion(false, NSError(domain: "WallcraftManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "Photos access denied"]))
+            PHPhotoLibrary.requestAuthorization { status in
+                DispatchQueue.main.async {
+                    if status == .authorized {
+                        self.performSaveToPhotos(image: image, completion: completion)
+                    } else {
+                        completion(false, NSError(domain: "WallcraftManager", code: 1, userInfo: [NSLocalizedDescriptionKey: "Photo library permission denied"]))
+                    }
                 }
             }
+        case .denied, .restricted:
+            completion(false, NSError(domain: "WallcraftManager", code: 1, userInfo: [NSLocalizedDescriptionKey: "Photo library permission denied"]))
+        case .limited:
+            // iOS 14+ limited access - still try to save
+            performSaveToPhotos(image: image, completion: completion)
         @unknown default:
-            completion(false, NSError(domain: "WallcraftManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "Unknown authorization status"]))
+            completion(false, NSError(domain: "WallcraftManager", code: 1, userInfo: [NSLocalizedDescriptionKey: "Unknown photo library permission status"]))
         }
     }
     
     private func performSaveToPhotos(image: UIImage, completion: @escaping (Bool, Error?) -> Void) {
+        var assetIdentifier: String?
+        
         PHPhotoLibrary.shared().performChanges({
-            let request = PHAssetCreationRequest.forAsset()
-            request.addResource(with: .photo, data: image.jpegData(compressionQuality: 0.9)!, options: nil)
+            // Create the asset creation request
+            let creationRequest = PHAssetCreationRequest.forAsset()
+            creationRequest.addResource(with: .photo, data: image.jpegData(compressionQuality: 0.9)!, options: nil)
             
-            // Create album if it doesn't exist
-            let albumName = "Wallcraft"
-            let collections = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .any, options: nil)
+            // Get the asset identifier
+            assetIdentifier = creationRequest.placeholderForCreatedAsset?.localIdentifier
             
-            var albumExists = false
-            collections.enumerateObjects { collection, _, _ in
-                if collection.localizedTitle == albumName {
-                    albumExists = true
-                    // Add to existing album
-                    if let albumChangeRequest = PHAssetCollectionChangeRequest(for: collection) {
-                        albumChangeRequest.addAssets([request.placeholderForCreatedAsset!] as NSArray)
-                    }
-                }
-            }
-            
-            if !albumExists {
-                // Create new album
-                let albumRequest = PHAssetCollectionChangeRequest.creationRequestForAssetCollection(withTitle: albumName)
-                albumRequest.addAssets([request.placeholderForCreatedAsset!] as NSArray)
-            }
+            // Try to add to Wallcraft album
+            self.addToWallcraftAlbum(assetIdentifier: assetIdentifier)
             
         }) { success, error in
             DispatchQueue.main.async {
@@ -182,8 +180,50 @@ public class WallcraftManagerPlugin: NSObject, FlutterPlugin {
         }
     }
     
+    private func addToWallcraftAlbum(assetIdentifier: String?) {
+        guard let assetIdentifier = assetIdentifier else { return }
+        
+        // Find or create Wallcraft album
+        let albumName = "Wallcraft"
+        let fetchOptions = PHFetchOptions()
+        fetchOptions.predicate = NSPredicate(format: "title = %@", albumName)
+        let collection = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .any, options: fetchOptions)
+        
+        if let album = collection.firstObject {
+            // Album exists, add photo to it
+            addPhotoToAlbum(assetIdentifier: assetIdentifier, album: album)
+        } else {
+            // Create new album
+            PHPhotoLibrary.shared().performChanges({
+                PHAssetCollectionChangeRequest.creationRequestForAssetCollection(withTitle: albumName)
+            }) { success, error in
+                if success {
+                    // Retry adding to the newly created album
+                    let newCollection = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .any, options: fetchOptions)
+                    if let newAlbum = newCollection.firstObject {
+                        self.addPhotoToAlbum(assetIdentifier: assetIdentifier, album: newAlbum)
+                    }
+                }
+            }
+        }
+    }
+    
+    private func addPhotoToAlbum(assetIdentifier: String, album: PHAssetCollection) {
+        let asset = PHAsset.fetchAssets(withLocalIdentifiers: [assetIdentifier], options: nil)
+        
+        PHPhotoLibrary.shared().performChanges({
+            if let albumChangeRequest = PHAssetCollectionChangeRequest(for: album) {
+                albumChangeRequest.addAssets(asset)
+            }
+        }) { success, error in
+            if let error = error {
+                print("Error adding photo to Wallcraft album: \(error.localizedDescription)")
+            }
+        }
+    }
+    
     private func showWallpaperInstructions() {
-        guard let topViewController = UIApplication.shared.windows.first?.rootViewController else {
+        guard let rootViewController = UIApplication.shared.keyWindow?.rootViewController else {
             return
         }
         
@@ -194,13 +234,13 @@ public class WallcraftManagerPlugin: NSObject, FlutterPlugin {
         )
         
         alert.addAction(UIAlertAction(title: "Open Settings", style: .default) { _ in
-            if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
-                UIApplication.shared.open(settingsURL)
+            if let settingsUrl = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(settingsUrl)
             }
         })
         
-        alert.addAction(UIAlertAction(title: "OK", style: .cancel))
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
         
-        topViewController.present(alert, animated: true)
+        rootViewController.present(alert, animated: true)
     }
 }

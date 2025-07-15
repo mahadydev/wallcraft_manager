@@ -1,6 +1,6 @@
 name: wallcraft_manager
 description: A Flutter plugin for setting wallpapers and saving images to gallery on Android and iOS. Supports different wallpaper types and modern platform APIs.
-version: 1.0.0
+version: 1.0.1
 homepage: https://github.com/mahadydev/wallcraft_manager
 repository: https://github.com/mahadydev/wallcraft_manager
 issue_tracker: https://github.com/mahadydev/wallcraft_manager/issues
@@ -34,4 +34,4 @@ flutter:
         package: wp.plugin.wallcraft.manager
         pluginClass: WallcraftManagerPlugin
       ios:
-        pluginClass: WallcraftManagerPlugin
+        pluginClass: SwiftWallcraftManagerPlugin
