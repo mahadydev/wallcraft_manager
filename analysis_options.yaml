@@ -1,4 +1,23 @@
+# analysis_options.yaml
 include: package:flutter_lints/flutter.yaml
 
-# Additional information about this file can be found at
-# https://dart.dev/guides/language/analysis-options
+linter:
+  rules:
+    - avoid_print
+    - prefer_const_constructors
+    - prefer_const_declarations
+    - prefer_final_fields
+    - prefer_final_locals
+    - sort_constructors_first
+    - sort_unnamed_constructors_first
+    - unnecessary_const
+    - unnecessary_new
+    - use_key_in_widget_constructors
+    - prefer_single_quotes
+    - require_trailing_commas
+    - lines_longer_than_80_chars
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"

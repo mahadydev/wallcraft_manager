@@ -217,7 +217,7 @@ class _ImageDetailScreenState extends State<ImageDetailScreen> {
                   ElevatedButton.icon(
                     onPressed: _downloading
                         ? null
-                        : () => _setWallpaper(WallpaperSetterType.homeScreen),
+                        : () => _setWallpaper(WallpaperSetterType.home),
                     icon: const Icon(Icons.wallpaper),
                     label: const Text('Set as Home Screen'),
                   ),
@@ -225,7 +225,7 @@ class _ImageDetailScreenState extends State<ImageDetailScreen> {
                   ElevatedButton.icon(
                     onPressed: _downloading
                         ? null
-                        : () => _setWallpaper(WallpaperSetterType.lockScreen),
+                        : () => _setWallpaper(WallpaperSetterType.lock),
                     icon: const Icon(Icons.lock),
                     label: const Text('Set as Lock Screen'),
                   ),

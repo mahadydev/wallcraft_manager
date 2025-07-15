@@ -1,11 +1,21 @@
 name: wallcraft_manager
-description: "A Flutter plugin for wallpaper set (home screen, lock screen, both)."
+description: A Flutter plugin for setting wallpapers and saving images to gallery on Android and iOS. Supports different wallpaper types and modern platform APIs.
 version: 1.0.0
 homepage: https://github.com/mahadydev/wallcraft_manager
+repository: https://github.com/mahadydev/wallcraft_manager
+issue_tracker: https://github.com/mahadydev/wallcraft_manager/issues
+documentation: https://github.com/mahadydev/wallcraft_manager#readme
+
+topics:
+  - wallpaper
+  - gallery
+  - images
+  - android
+  - ios
 
 environment:
-  sdk: 3.8.1
-  flutter: '>=3.3.0'
+  sdk: '>=2.17.0 <4.0.0'
+  flutter: '>=3.0.0'
 
 dependencies:
   flutter:

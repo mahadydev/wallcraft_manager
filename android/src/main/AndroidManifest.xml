@@ -1,4 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
   package="wp.plugin.wallcraft.manager">
-  <uses-permission android:name="android.permission.SET_WALLPAPER" />
+
+     <!-- Required permissions -->
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" 
+                     android:maxSdkVersion="28" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    
+    <!-- Optional: for better compatibility -->
+    <uses-permission android:name="android.permission.SET_WALLPAPER_HINTS" />
 </manifest>
