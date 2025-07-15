@@ -1,4 +1,18 @@
 # CHANGELOG.md
+## 1.0.1
+
+### Bug Fixes
+- Fixed iOS implementation for wallpaper setting and gallery saving
+- Added proper iOS Photos framework integration
+- Added user-friendly wallpaper setting instructions for iOS
+- Automatic Wallcraft album creation on iOS
+- Improved error handling for iOS platform
+
+### Features
+- iOS now properly saves images to Photos app
+- iOS shows helpful instructions for manual wallpaper setting
+- iOS supports both file path and bytes input methods
+
 ## 1.0.0
 
 ### Features
