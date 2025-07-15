@@ -26,7 +26,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  wallcraft_manager: ^1.0.0
+  wallcraft_manager: ^latest_version
 ```
 
 ## Setup
